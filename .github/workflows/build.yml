@@ -1,0 +1,55 @@
+name: Build installers
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omniflow-${{ matrix.os }}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.blockmap
+            release/latest*.yml
+
+  # Only runs on a version tag push (v1.0.0, v1.2.3-beta, etc) - workflow_dispatch
+  # runs above just for a build check without publishing anything.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Collect release assets
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.blockmap' -o -name 'latest*.yml' \) -exec cp {} release-assets/ \;
+          cp windows/build.ps1 release-assets/build-windows.ps1
+          cp mac/build.sh release-assets/build-mac.sh
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true

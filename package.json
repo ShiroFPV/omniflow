@@ -1,0 +1,91 @@
+{
+  "name": "omniflow",
+  "description": "Desktop tasks/notes/calendar/timer app with optional Spotify control and cross-device sync through your own Cloudflare account.",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:web": "vite --config vite.web.config.ts",
+    "build": "tsc -b && vite build",
+    "build:web": "tsc -b && vite build --config vite.web.config.ts",
+    "dist": "npm run build && electron-builder",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "build": {
+    "appId": "com.omniflow.app",
+    "productName": "OmniFlow",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "cloudflare-worker",
+        "to": "cloudflare-worker"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "framer-motion": "^12.42.2",
+    "ical.js": "^2.2.1",
+    "lowdb": "^7.0.1",
+    "lucide-react": "^1.26.0",
+    "marked": "^18.0.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "autoprefixer": "^10.5.4",
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
+    "oxlint": "^1.71.0",
+    "playwright-core": "^1.61.1",
+    "postcss": "^8.5.22",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vite-plugin-electron": "^1.1.0",
+    "vite-plugin-electron-renderer": "^1.0.0"
+  }
+}
