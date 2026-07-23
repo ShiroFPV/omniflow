@@ -17,6 +17,7 @@
   "build": {
     "appId": "com.omniflow.app",
     "productName": "OmniFlow",
+    "publish": null,
     "directories": {
       "output": "release"
     },
